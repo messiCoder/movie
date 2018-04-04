@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tof.dao.MovieDao">
+
+    <resultMap type="com.tof.entity.Movie" id="movieMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="imageUrl" column="imageUrl"/>
+        <result property="score" column="score"/>
+        <result property="director" column="director"/>
+        <result property="actor" column="actor"/>
+        <result property="type" column="type"/>
+        <result property="region" column="region"/>
+        <result property="showTime" column="showTime"/>
+        <result property="imdb" column="imdb"/>
+        <result property="movieLong" column="movieLong"/>
+        <result property="otherName" column="otherName"/>
+        <result property="movieStory" column="movieStory"/>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, name, imageUrl, score , director ,actor  ,type  ,region  ,showTime ,imdb  ,movieLong   ,otherName   , movieStory
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="movieMap">
+        select
+        <include refid="Base_Column_List" />
+        from movie
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByName" resultMap="movieMap">
+        select
+        <include refid="Base_Column_List" />
+        from movie
+        where name = #{name,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectAllMovie" resultMap="movieMap"  >
+        select
+        <include refid="Base_Column_List" />
+        from movie WHERE id &gt; 5
+
+    </select>
+
+    <select id="selectIndexMovie" resultMap="movieMap"  >
+        select
+        <include refid="Base_Column_List" />
+        from movie WHERE id  &lt; 5
+
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+        delete from movie
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.tof.entity.Movie" >
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        insert into movie (id, name, imageUrl, score , director ,actor  ,type  ,region  ,showTime ,imdb  ,movieLong   ,otherName   , movieStory )
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{imageUrl,jdbcType=VARCHAR},#{score,jdbcType=VARCHAR},#{director,jdbcType=VARCHAR},
+         #{actor,jdbcType=VARCHAR},#{type,jdbcType=VARCHAR},#{region,jdbcType=VARCHAR},#{showTime,jdbcType=VARCHAR},#{imdb,jdbcType=VARCHAR},
+         #{movieLong,jdbcType=VARCHAR},#{otherName,jdbcType=VARCHAR},#{movieStory,jdbcType=VARCHAR})
+    </insert>
+
+
+</mapper>

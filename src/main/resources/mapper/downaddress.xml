@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tof.dao.DownAddressDao">
+
+    <resultMap type="com.tof.entity.DownAddress" id="downAddressMap">
+        <result property="id" column="id"/>
+        <result property="movieId" column="movieId"/>
+        <result property="downName" column="downName"/>
+        <result property="seedUrl" column="seedUrl"/>
+        <result property="downUrl" column="downUrl"/>
+        <result property="rp" column="rp"/>
+        <result property="size" column="size"/>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, movieId, downName, seedUrl , downUrl, rp, size
+    </sql>
+
+    <select id="selectByMovieId" resultMap="downAddressMap">
+        select
+        <include refid="Base_Column_List" />
+        from downaddress
+        where movieId = #{movieId,jdbcType=INTEGER}
+    </select>
+
+    <insert id="insert" parameterType="com.tof.entity.DownAddress" >
+        insert into downaddress ( movieId, downName, seedUrl , downUrl, rp, size )
+        values (#{movieId,jdbcType=INTEGER}, #{downName,jdbcType=VARCHAR}, #{seedUrl,jdbcType=VARCHAR},
+                #{downUrl,jdbcType=VARCHAR},#{rp,jdbcType=VARCHAR},#{size,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 批量新增 -->
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into downaddress ( movieId, downName, seedUrl , downUrl, rp, size )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.movieId},#{item.downName},#{item.seedUrl},#{item.downUrl},#{item.rp}, #{item.size})
+        </foreach>
+    </insert>
+</mapper>

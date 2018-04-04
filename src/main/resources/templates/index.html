@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <script src="webjars/jquery/3.1.1/jquery.min.js"></script>
+    <script src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <link href="css/slider.css" rel="stylesheet" type="text/css" media="all"/>
+    <script type="text/javascript" src="js/move-top.js"></script>
+    <script type="text/javascript" src="js/easing.js"></script>
+</head>
+<body style="width:80%;margin-left: 10%;">
+    <div class="header">
+        <div class="wrap">
+            <div class="header_top">
+                <div class="logo">
+                    <a href="index"><img src="images/logo.png" alt=""  style="height: 70px;"/></a>
+                </div>
+
+                <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="3000" style="margin-top: 30px;">
+                    <!-- 轮播（Carousel）指标 -->
+                    <ol class="carousel-indicators">
+                        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#myCarousel" data-slide-to="1"></li>
+                        <li data-target="#myCarousel" data-slide-to="2"></li>
+                    </ol>
+                    <!-- 轮播（Carousel）项目 -->
+                    <div class="carousel-inner">
+                        <div class="item">
+                            <img src="images/1.jpg" style="width: 100%;" alt="First slide">
+                        </div>
+                        <div class="item">
+                            <img src="images/2.jpg" style="width: 100%;" alt="Second slide">
+                        </div>
+                        <div class="item">
+                            <img src="images/3.jpg" style="width: 100%;" alt="Third slide">
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+    <!------------End Header ------------>
+    <div class="main">
+        <div class="wrap">
+            <div class="content">
+                <div class="content_top">
+                    <div class="heading">
+                        <h3>最新电影</h3>
+                    </div>
+                </div>
+                <div class="section group" >
+                    <div class="grid_1_of_5 images_1_of_5" th:each=" newItem:${newMovies}">
+                        <a th:href="@{'/detail/' + ${newItem.id}}"><img class="myImgCla" th:src="${newItem.imageUrl}" alt="" /></a>
+                        <h2><a th:href="@{'/detail/' + ${newItem.id}}" th:text="${newItem.altName}" th:title="${newItem.name}"></a></h2>
+                        <div class="price-details">
+                            <div style="width: 100%;text-align: center">
+                                <p><span class="rupees" th:text="${'评分：' + newItem.score}"></span></p>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content_bottom">
+                    <div class="heading">
+                        <h3>热门电影</h3>
+                    </div>
+                </div>
+                <div class="section group" >
+                    <div class="grid_1_of_5 images_1_of_5" th:each=" newItem:${hotMovies}">
+                        <a th:href="@{'/detail/' + ${newItem.id}}"><img class="myImgCla"  th:src="${newItem.imageUrl}" alt="" /></a>
+                        <h2><a th:href="@{'/detail/' + ${newItem.id}}" th:text="${newItem.altName}" th:title="${newItem.name}"></a></h2>
+                        <div class="price-details">
+                            <div style="width: 100%;text-align: center">
+                                <p><span class="rupees" th:text="${'评分：' + newItem.score}"></span></p>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="hotMovieDiv"></div>
+                <div style="text-align: center;margin-top: 20px;font-size: 28px;color: #ef7907;">
+                    <a href="javascript:void(0);" id="getMore" style="cursor: pointer;">点击获取更多</a>
+                    <a href="javascript:void(0);" id="noMore"  style="cursor: pointer;display: none;">我也是有底线的</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var nextPage = 3;
+        $(document).ready(function() {
+            $().UItoTop({ easingType: 'easeOutQuart' });
+
+            /**
+             * 获取更多
+             */
+            $("#getMore").click(function () {
+                $.ajax({
+                    url: "/getMore",
+                    type: "Post",
+                    data:{nextPage:nextPage},
+                    dataType: "json",
+                    error: function(){
+                        alert('服务器错误.请稍后重试.', 0);
+                    },
+                    success: function(data){
+                        var totalPage = data.totalPage;
+                        var htmlStr = '<div class="section group" >';
+                        for(var i=0;i<data.pageData.length;i++){
+                            htmlStr += '<div class="grid_1_of_5 images_1_of_5" >' +
+                                          '<a href="/detail/'+ data.pageData[i].id +'"><img class="myImgCla"  src="' + data.pageData[i].imageUrl + '" alt="" /></a>' +
+                                          '<h2><a href="/detail/'+ data.pageData[i].id +'" title="'+ data.pageData[i].name +'">'+ data.pageData[i].altName +'</a></h2>' +
+                                          '<div class="price-details">' +
+                                            '<div style="width: 100%;text-align: center">' +
+                                              '<p><span class="rupees"> 评分：'+ data.pageData[i].score +'</span></p>' +
+                                            '</div>' +
+                                            '<div class="clear"></div>' +
+                                          '</div>' +
+                                        '</div>';
+                        }
+                        htmlStr += '</div>';
+                        $("#hotMovieDiv").append(htmlStr);
+                        if(nextPage>=totalPage){
+                            $("#getMore").hide();
+                            $("#noMore").show();
+                        }
+                        nextPage ++;
+                    }
+                });
+            });
+
+        });
+
+
+    </script>
+    <div class="footer">
+        <div class="wrap">
+            <div class="copy_right">
+                <p>Copyright &copy; 2018.Company name All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+    <a href="#" id="toTop"><span id="toTopHover"> </span></a>
+</body>
+</html>
